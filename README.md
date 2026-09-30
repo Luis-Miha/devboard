@@ -48,7 +48,7 @@ vedono la board aggiornarsi senza refresh. Le notifiche personali arrivano nella
 ## Requisiti
 
 - Node.js ≥ 18 (testato con Node 22)
-- MySQL 8.x in esecuzione
+- MySQL 8.x (o MariaDB 11.x, pienamente compatibile) in esecuzione
 - Git (e [GitHub CLI](https://cli.github.com/) per il push su GitHub)
 
 ---
@@ -278,7 +278,7 @@ poi compila `DB_*` nel backend e fai il redeploy.
 
 ## Note
 
-- Testato con Node 22 + MySQL 8. Lo schema SQL è compatibile con MySQL 5.7+ (tipo `JSON`).
+- Testato con Node 22 + MySQL 8 (e MariaDB 11.4). Lo schema SQL è compatibile con MySQL 5.7+ (tipo `JSON`).
 - In assenza di MySQL il backend resta comunque avviabile: la health check risponde, le query falliscono con errore 500 finché il DB non è raggiungibile.
 - License: MIT.
 
