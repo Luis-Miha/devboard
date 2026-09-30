@@ -1,0 +1,21 @@
+# Dipendenze
+node_modules/
+
+# Build
+dist/
+build/
+
+# Variabili d'ambiente (mai committare i segreti reali)
+.env
+.env.local
+.env.*.local
+
+# Log
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,74 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   DevBoard — palette dark ispirata a Linear.app
+   background: #0e0e10 | surface: #1a1a1f | border: #2e2e35
+   accento:   #5b5bd6 | testo:      #e4e4e7
+   ============================================================ */
+@theme {
+  --color-background: #0e0e10;
+  --color-surface: #1a1a1f;
+  --color-surface-2: #22222a;
+  --color-border: #2e2e35;
+  --color-accent: #5b5bd6;
+  --color-accent-hover: #6d6de3;
+  --color-foreground: #e4e4e7;
+  --color-muted: #8b8b96;
+  --color-muted-2: #52525b;
+  --color-destructive: #ef4444;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-urgent: #ef4444;
+  --color-high: #f97316;
+  --color-medium: #3b82f6;
+  --color-low: #71717a;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --animate-fade-in: fade-in 0.2s ease-out;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar sottile in stile Linear */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: #2e2e35;
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
+/* Utility per il drag preview di dnd-kit */
+.drag-overlay {
+  cursor: grabbing;
+}
