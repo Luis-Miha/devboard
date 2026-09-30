@@ -155,8 +155,8 @@ router.post('/refresh', async (req, res) => {
 
 /** DELETE /api/auth/logout — rimuove il cookie del refresh token. */
 router.delete('/logout', (_req, res) => {
-  const nomeCookie = process.env.REFRESH_COOKIE_NAME || 'devboard_refresh';
-  res.clearCookie(nomeCookie, { httpOnly: true, sameSite: 'lax', path: '/' });
+  const { maxAge, ...opt } = opzioniCookieRefresh();
+  res.clearCookie(process.env.REFRESH_COOKIE_NAME || 'devboard_refresh', opt);
   return res.json({ ok: true });
 });
 
@@ -170,15 +170,30 @@ router.get('/me', verificaToken, async (req, res) => {
   return res.json({ user: utenti[0] });
 });
 
-/** Imposta il cookie httpOnly del refresh token (7 giorni). */
-function impostaCookieRefresh(res, token) {
-  res.cookie(process.env.REFRESH_COOKIE_NAME || 'devboard_refresh', token, {
-    httpOnly: true,   // non accessibile da JavaScript
-    sameSite: 'lax',  // protezione CSRF base
-    secure: process.env.NODE_ENV === 'production',
+/**
+ * Attributi del cookie di refresh.
+ * In produzione (frontend e backend su domini DIVERSI, es. Vercel + Render)
+ * serve SameSite=None + Secure: con SameSite=Lax il browser non invierebbe
+ * il cookie nelle richieste cross-site e il silent-refresh fallirebbe.
+ * In locale resta SameSite=Lax (più restrittivo).
+ * Sovrascrivibile con la variabile COOKIE_SAMESITE.
+ */
+function opzioniCookieRefresh() {
+  const sameSite =
+    process.env.COOKIE_SAMESITE ||
+    (process.env.NODE_ENV === 'production' ? 'none' : 'lax');
+  return {
+    httpOnly: true, // non accessibile da JavaScript
+    sameSite,
+    secure: sameSite === 'none' || process.env.NODE_ENV === 'production',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 giorni
     path: '/'
-  });
+  };
+}
+
+/** Imposta il cookie httpOnly del refresh token (7 giorni). */
+function impostaCookieRefresh(res, token) {
+  res.cookie(process.env.REFRESH_COOKIE_NAME || 'devboard_refresh', token, opzioniCookieRefresh());
 }
 
 export default router;

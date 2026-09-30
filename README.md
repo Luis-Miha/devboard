@@ -219,6 +219,54 @@ devboard/
 - Tutti gli input validati con **zod** lato server; i ticket/commenti sono accessibili solo ai membri dello workspace (controllo membership su ogni query).
 - RBAC: solo `owner`/`admin` possono eliminare progetti e gestire i membri.
 
+## Deploy
+
+> ⚠️ **Importante:** Vercel ospita solo il **frontend**. Il backend (Express + Socket.io
+> persistenti) e il database MySQL **non possono girare su Vercel** (è una piattaforma
+> serverless senza WebSocket e senza MySQL). Architettura consigliata:
+>
+> `Vercel (frontend)` ──REST/WS──► `Render/Railway (backend)` ──► `MySQL gestito`
+
+### 1. Frontend su Vercel
+
+1. [vercel.com](https://vercel.com) → **Add New → Project** → importa il repo `Luis-Miha/devboard`
+2. **Settings → General → Root Directory**: imposta `frontend` (fondamentale: il repo è un monorepo)
+3. Framework preset: **Vite** (rilevato automaticamente) · Build Command `npm run build` · Output Directory `dist`
+4. **Settings → Environment Variables** (obbligatorie **prima** del primo build, sono compile-time):
+   - `VITE_API_URL` = `https://<nome-backend>.onrender.com`
+   - `VITE_SOCKET_URL` = `https://<nome-backend>.onrender.com`
+5. Premi **Deploy**. Il fallback SPA per React Router è già configurato in `frontend/vercel.json`.
+
+⚠️ Se cambi le variabili `VITE_*` in seguito serve un **Redeploy**: Vite le inietta a build time.
+
+### 2. Backend (Render.com — gratuito)
+
+1. Render → **New → Web Service** → collega lo stesso repo GitHub
+2. Impostazioni:
+   - Root Directory: `backend`
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+   - Health Check Path: `/api/health`
+3. **Environment Variables:**
+   `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`,
+   `JWT_SECRET`, `JWT_REFRESH_SECRET` (stringhe lunghe casuali),
+   `CLIENT_ORIGIN=https://<nome-frontend>.vercel.app`,
+   `NODE_ENV=production`
+4. `COOKIE_SAMESITE` **non** serve impostarla: in produzione il cookie di refresh
+   usa già `SameSite=None; Secure` (obbligatorio per il cross-domain Vercel ↔ Render).
+
+### 3. Database MySQL
+
+Vercel/Render free non forniscono MySQL: usa un MySQL gestito
+(Railway MySQL, Aiven free tier, PlanetScale, o un VPS con Docker).
+Carica lo schema con:
+
+```bash
+mysql -h HOST -u USER -p < backend/database/schema.sql
+```
+
+poi compila `DB_*` nel backend e fai il redeploy.
+
 ## Note
 
 - Testato con Node 22 + MySQL 8. Lo schema SQL è compatibile con MySQL 5.7+ (tipo `JSON`).

@@ -21,10 +21,17 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io con CORS abilitato sul frontend (Vite in dev)
+// Origini consentite al CORS: lista separata da virgole, es.
+// "https://mio-progetto.vercel.app,http://localhost:5173"
+const originiCORS = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+// Socket.io con CORS limitato al frontend (Vite in dev / dominio Vercel in prod)
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    origin: originiCORS,
     credentials: true
   }
 });
@@ -35,7 +42,7 @@ configuraSocket(io);
 app.use(helmet({ crossOriginResourcePolicy: false }));
 app.use(
   cors({
-    origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+    origin: originiCORS, // multiple origini ammesse (dev + produzione)
     credentials: true // necessario per il cookie httpOnly del refresh token
   })
 );
