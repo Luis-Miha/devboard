@@ -55,6 +55,15 @@ vedono la board aggiornarsi senza refresh. Le notifiche personali arrivano nella
 
 ## Installazione
 
+### Quick start (un solo comando)
+
+```bash
+npm install         # alla root: installa "concurrently"
+npm run dev         # avvia backend (:4000) + frontend (:5173) insieme
+```
+
+oppure, preferendo due terminali distinti:
+
 ### 1. Database
 
 ```bash
